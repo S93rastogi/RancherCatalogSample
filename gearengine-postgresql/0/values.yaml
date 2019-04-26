@@ -1,0 +1,37 @@
+
+replicas: 1
+image:
+  repository: postgres
+  tag: 11.1-alpine
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  containerPort: 5432 # default postgres port
+
+service:
+  type: NodePort
+  port: 30061 # Service Port
+  nodePort: 30061 # External Port, see GearEngine Port Range Table
+
+pgadmin:
+  deploy: false
+  replicas: 1
+
+  image:
+    # repository: dpage/pgadmin4
+    # tag: 3.6
+    repository: neetpiq/todo-core-webapi
+    tag: 1.2
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: IfNotPresent
+    containerPort: 80 # default port
+
+  service:
+    type: NodePort
+    port: 30060 # Service Port
+    nodePort: 30060 # External Port, see GearEngine Port Range Table

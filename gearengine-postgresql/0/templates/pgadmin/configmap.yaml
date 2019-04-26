@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "postgresql.fullname" . }}-adminconfig # config-map name 
+  labels:
+    app: {{ template "postgresql.name" . }} # app name
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+data: # environment vars TODO: use secrets in production
+  PGADMIN_DEFAULT_EMAIL: "gearengine@klingelnberg.com"
+  PGADMIN_DEFAULT_PASSWORD: "gearengine"

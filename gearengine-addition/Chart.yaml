@@ -1,0 +1,8 @@
+name: gearengine-addition
+version: 0.1.0
+description: Addition service by klingelnberg
+appVersion: "1.0"
+apiVersion: v1
+maintainers:
+  - name: shubhanshu Rastogi
+    email: s93rastogi@gmail.com

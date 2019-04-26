@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "gearengine-addition.fullname" . }}
+  labels:
+    app: {{ template "gearengine-addition.name" . }}
+    chart: {{ template "gearengine-addition.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: {{ template "gearengine-addition.name" . }} # app name
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name | quote }}
+        heritage: {{ .Release.Service | quote }}
+    spec:
+      containers:
+        - name: {{ template "gearengine-addition.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.image.containerPort }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "gearengine-addition.fullname" . }}-configuration # references config name
+      imagePullSecrets:
+        - name: {{ .Values.imageCredentials.name }}
+      

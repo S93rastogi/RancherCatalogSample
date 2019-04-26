@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "postgresql.fullname" . }}
+  labels:
+    app: {{ template "postgresql.name" . }} # app name
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "postgresql.name" . }} # app name
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name | quote }}
+        heritage: {{ .Release.Service | quote }}
+    spec:
+      containers:
+          # postgresql container
+        - name: {{ template "postgresql.fullname" . }}
+          # image from docker repository
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          # map container ports
+          ports:
+            - name: postgres-port
+              containerPort: {{ .Values.image.containerPort }}
+          # environment variables from configuration file
+          envFrom:
+            - configMapRef:
+                name: {{ template "postgresql.fullname" . }}-config # config-map name 
+          # map external volumes to internal mount
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data # path of the volume
+              name: {{ template "postgresql.name" . }} # container name
+
+          # pg admin container
+        - name: {{ template "postgresql.fullname" . }}-admin
+          # image from docker repository
+          image: {{ .Values.pgadmin.image.repository }}:{{ .Values.pgadmin.image.tag }}
+          imagePullPolicy: {{ .Values.pgadmin.image.pullPolicy | quote }}
+          # map container ports
+          ports:
+            - name: pgadmin-port
+              containerPort: {{ .Values.pgadmin.image.containerPort }}
+          # environment variables from configuration file
+          envFrom:
+            - configMapRef:
+                name: {{ template "postgresql.fullname" . }}-adminconfig # config-map name 
+      volumes:
+        # attach the volume claim
+        - name: {{ template "postgresql.name" . }} # app name
+          persistentVolumeClaim:
+            claimName: {{ template "postgresql.fullname" . }}-pvc # storage claim name

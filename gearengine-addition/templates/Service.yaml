@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "gearengine-addition.fullname" . }} # service name 
+  labels:
+    app: {{ template "gearengine-addition.name" . }} # app name 
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  type: {{ .Values.service.type }}
+  # delcate service ports
+  ports:
+    - targetPort: {{ .Values.image.containerPort }}
+      port: {{ .Values.service.port }}
+      nodePort: {{ .Values.service.port }} # use the same port for internal and external communicaton of the node
+
+      # optional loadbalancer IP
+      {{- if and (eq .Values.service.type "LoadBalancer") .Values.service.loadBalancerIP }}
+      loadBalancerIP: {{ .Values.service.loadBalancerIP }}
+      {{- end }}
+  selector:
+   app: {{ template "gearengine-addition.name" . }} # app name
+   release: {{ .Release.Name | quote }}

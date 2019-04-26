@@ -1,0 +1,35 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: {{ template "postgresql.fullname" . }}-pvv # storage volume name
+  labels:
+    type: local
+    app: {{ template "postgresql.name" . }} # app name
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data" # path of postgresql
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ template "postgresql.fullname" . }}-pvc # storage claim name
+  labels:
+    app: {{ template "postgresql.name" . }} # app name
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany # enable read-write
+  resources:
+    requests:
+      storage: 5Gi # size of the storage

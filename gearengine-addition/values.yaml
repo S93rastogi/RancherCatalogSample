@@ -1,0 +1,16 @@
+
+replicas: 1
+
+image:
+  repository: klingelnberg.azurecr.io/gearengine/addition
+  tag: latest
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  pullPolicy: Always
+  containerPort: 80 # default port for any web application
+  
+
+service:
+  type: NodePort
+  port: 30055 # see GearEngine Port Range Table

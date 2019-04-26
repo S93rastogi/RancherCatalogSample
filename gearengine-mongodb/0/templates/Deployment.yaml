@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "gearengine-mongodb.fullname" . }}
+  labels:
+    app: {{ template "gearengine-mongodb.name" . }}
+    chart: {{ template "gearengine-mongodb.chart" . }}
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "gearengine-mongodb.name" . }} # app name
+        chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+        release: {{ .Release.Name | quote }}
+        heritage: {{ .Release.Service | quote }}
+    spec:
+      containers:
+        - name: {{ template "gearengine-mongodb.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          ports:
+            - containerPort: {{ .Values.image.containerPort }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "gearengine-mongodb.fullname" . }}-configuration # references config name
+          volumeMounts:
+            - mountPath: /var/lib/gearengine-mongodb/data # path of the volume
+              name: {{ template "gearengine-mongodb.name" . }} # storage volume name
+      volumes:
+        - name: {{ template "gearengine-mongodb.name" . }} # app name
+          persistentVolumeClaim:
+            claimName: {{ template "gearengine-mongodb.fullname" . }}-pv-claim # storage claim name

@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "postgresql.fullname" . }}-admin-ingress
+  labels:
+    # deployment labels
+    app: {{ template "postgresql.name" . }} # app name 
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+  annotations:
+    kubernetes.io/ingress.class: traefik # reference to traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+spec:
+  rules:
+  - host: gearengine.internal
+    http:
+      paths:
+      - path: /tools
+        backend:
+          serviceName: {{ template "postgresql.fullname" . }}-admin # service name 
+          servicePort: pgadmin-port

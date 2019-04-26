@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "postgresql.fullname" . }}-ingress 
+  labels:
+    # deployment labels
+    app: {{ template "postgresql.name" . }} # app name 
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+  annotations:
+    kubernetes.io/ingress.class: traefik # reference to traefik
+spec:
+  rules:
+  - host: postgres.gearengine.internal
